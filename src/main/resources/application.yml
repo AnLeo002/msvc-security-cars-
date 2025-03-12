@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: msvc-security
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/cars-realm-dev
+          jwk-set-uri: http://localhost:9090/realms/cars-realm-dev/protocol/openid-connect/certs
+  config:
+    import: optional:configserver:http://localhost:8888
+
+logging:
+  level:
+    org:
+    keycloak: DEBUG
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
