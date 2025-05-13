@@ -6,6 +6,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.Path;
@@ -18,6 +20,11 @@ import java.util.List;
 public class KeycloakController {
     @Autowired
     private IKeycloakService keycloakService;
+
+    @GetMapping("/me")
+    public ResponseEntity<String> me(@AuthenticationPrincipal Jwt principal) {
+        return ResponseEntity.ok("Usuario autenticado: " + principal.getSubject());
+    }
     @GetMapping("/search")
     @PreAuthorize("hasRole('admin_client_role')")
     public ResponseEntity<List<UserRepresentation>> findAllUsers(){
