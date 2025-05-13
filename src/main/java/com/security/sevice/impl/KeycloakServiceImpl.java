@@ -20,16 +20,22 @@ import java.util.List;
 @Service
 @Slf4j
 public class KeycloakServiceImpl implements IKeycloakService {
+    public KeycloakProvider provider;
+
+    public KeycloakServiceImpl(KeycloakProvider provider) {
+        this.provider = provider;
+    }
+
     @Override
     public List<UserRepresentation> findAllUsers() {
-        return KeycloakProvider.getRealmResource()
+        return provider.getRealmResource()
                 .users()
                 .list();
     }
 
     @Override
     public List<UserRepresentation> searchUserByUsername(String username) {
-        return KeycloakProvider.getRealmResource()
+        return provider.getRealmResource()
                 .users().searchByUsername(username,true);//TRUE:el nombre de usuario es exacto
     }
 
@@ -37,7 +43,7 @@ public class KeycloakServiceImpl implements IKeycloakService {
     public String createUser(@NonNull UserDTO userDTO) {
 
         int status = 0;
-        UsersResource userResource = KeycloakProvider.getUserResource();
+        UsersResource userResource = provider.getUserResource();
 
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setFirstName(userDTO.firstName());
@@ -61,7 +67,7 @@ public class KeycloakServiceImpl implements IKeycloakService {
 
             userResource.get(userId).resetPassword(credentialRepresentation);
 
-            RealmResource realmResource = KeycloakProvider.getRealmResource();
+            RealmResource realmResource = provider.getRealmResource();
 
             List<RoleRepresentation> roleRepresentations;
 
@@ -93,7 +99,7 @@ public class KeycloakServiceImpl implements IKeycloakService {
 
     @Override
     public void deleteUser(String id) {
-        KeycloakProvider.getUserResource()
+        provider.getUserResource()
                 .get(id)
                 .remove();
     }
@@ -116,7 +122,7 @@ public class KeycloakServiceImpl implements IKeycloakService {
 
         userRepresentation.setCredentials(Collections.singletonList(credentialRepresentation));
 
-        UserResource userResource = KeycloakProvider.getUserResource().get(id);
+        UserResource userResource = provider.getUserResource().get(id);
         userResource.update(userRepresentation);
 
     }
