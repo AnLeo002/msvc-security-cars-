@@ -1,3 +1,5 @@
+server:
+  port: 8181
 spring:
   application:
     name: msvc-security
@@ -27,3 +29,11 @@ jwt:
     converter:
       principalAttribute: preferred_username
       resource-id: cars-client
+keycloak:
+  realm-name: cars-realm-dev
+  server-url: http://localhost:9090
+  admin-cli: admin-cli
+  username: admin
+  password: admin
+  client-secret: HfMVc8W9Q6WTqKzPdbSFIXlSIArlhkqo
+  enabled: true
