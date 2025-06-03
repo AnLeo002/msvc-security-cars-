@@ -8,13 +8,6 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.springframework.stereotype.Component;
 @Component
 public class KeycloakProvider {
-    /*private static final String SERVER_URL = "http://localhost:9090";
-    private static final String REALM_NAME = "cars-realm-dev";
-    private static final String REALM_MASTER =  "master";
-    private static final String ADMIN_CLI = "admin-cli";
-    private static final String USER_CONSOLE = "admin";
-    private static final String PASSWORD_CONSOLE = "admin";
-    private static final String CLIENT_SECRET = "HfMVc8W9Q6WTqKzPdbSFIXlSIArlhkqo";*/
     private  KeycloakProperties properties;
 
     public KeycloakProvider(KeycloakProperties properties) {
@@ -38,6 +31,17 @@ public class KeycloakProvider {
     public UsersResource getUserResource(){//Permite el manejo de usuarios
         RealmResource realmResource = getRealmResource();
         return realmResource.users();
-
+    }
+    public String getClientSecret(){
+        return properties.getClientSecret();
+    }
+    public String getClientId(){
+        return properties.getClientId();
+    }
+    public String getRealm(){
+        return properties.getRealmName();
+    }
+    public String getServerUrl(){
+        return properties.getServerUrl();
     }
 }
