@@ -13,7 +13,12 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
@@ -125,5 +130,33 @@ public class KeycloakServiceImpl implements IKeycloakService {
         UserResource userResource = provider.getUserResource().get(id);
         userResource.update(userRepresentation);
 
+    }
+
+    @Override
+    public String login(String username, String password) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String,String> form = new LinkedMultiValueMap<>();
+        form.add("grant_type","password");
+        form.add("client_id",provider.getClientId());
+        form.add("client_secret", provider.getClientSecret());
+        form.add("username",username);
+        form.add("password",password);
+
+        HttpEntity<MultiValueMap<String,String>> entity = new HttpEntity<>(form,headers);
+        //http://localhost:9090/realms/cars-realm-dev/protocol/openid-connect/token
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                provider.getServerUrl()+"/realms/"+provider.getRealm()+"/protocol/openid-connect/token",
+                entity,
+                String.class
+        );
+        if (response.getStatusCode().is2xxSuccessful()){
+            return response.getBody();
+        }else{
+            throw new ResponseStatusException(HttpStatus.FAILED_DEPENDENCY, "No fue posible iniciar sesión");
+        }
     }
 }
