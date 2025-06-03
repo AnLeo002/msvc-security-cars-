@@ -1,13 +1,12 @@
 package com.security.config;
 
 import com.security.util.KeycloakProperties;
-import com.security.util.KeycloakProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,7 +26,9 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(csrf->csrf.disable())
-                .authorizeHttpRequests(http -> http.anyRequest().authenticated())
+                .authorizeHttpRequests(http -> http
+                        .requestMatchers(HttpMethod.POST,"/keycloak/user/**").permitAll()
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth->{
                     oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter));
                 })
