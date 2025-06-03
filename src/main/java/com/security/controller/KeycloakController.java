@@ -1,7 +1,9 @@
 package com.security.controller;
 
 import com.security.controller.dto.UserDTO;
+import com.security.controller.dto.UserLoginDTO;
 import com.security.sevice.IKeycloakService;
+import jakarta.validation.Valid;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.Path;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -25,6 +26,14 @@ public class KeycloakController {
     public ResponseEntity<String> me(@AuthenticationPrincipal Jwt principal) {
         return ResponseEntity.ok("Usuario autenticado: " + principal.getSubject());
     }
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Valid UserLoginDTO userLoginDTO) {
+        String tokenJson = keycloakService.login(
+                userLoginDTO.username(),
+                userLoginDTO.password()
+        );
+        return ResponseEntity.ok(tokenJson);
+    }
     @GetMapping("/search")
     @PreAuthorize("hasRole('admin_client_role')")
     public ResponseEntity<List<UserRepresentation>> findAllUsers(){
@@ -35,7 +44,7 @@ public class KeycloakController {
         return ResponseEntity.ok(keycloakService.searchUserByUsername(username));
     }
     @PostMapping("/create")
-    public ResponseEntity<String> createUser(@RequestBody UserDTO userDTO) throws URISyntaxException {
+    public ResponseEntity<String> createUser(@RequestBody @Valid UserDTO userDTO) throws URISyntaxException {
         String response = keycloakService.createUser(userDTO);
         return ResponseEntity.created(new URI("/keycloak/user/create")).body(response);
     }
