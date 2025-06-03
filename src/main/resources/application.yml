@@ -36,4 +36,5 @@ keycloak:
   username: admin
   password: admin
   client-secret: HfMVc8W9Q6WTqKzPdbSFIXlSIArlhkqo
+  client-id: cars-client
   enabled: true
