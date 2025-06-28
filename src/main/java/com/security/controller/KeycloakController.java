@@ -1,20 +1,26 @@
 package com.security.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.security.controller.dto.UserDTO;
 import com.security.controller.dto.UserLoginDTO;
 import com.security.sevice.IKeycloakService;
 import jakarta.validation.Valid;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/keycloak/user")
@@ -27,12 +33,20 @@ public class KeycloakController {
         return ResponseEntity.ok("Usuario autenticado: " + principal.getSubject());
     }
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid UserLoginDTO userLoginDTO) {
+    public ResponseEntity<Map<String,Object>> login(@RequestBody @Valid UserLoginDTO userLoginDTO) {
         String tokenJson = keycloakService.login(
                 userLoginDTO.username(),
                 userLoginDTO.password()
         );
-        return ResponseEntity.ok(tokenJson);
+
+        // Convertir el String JSON a un Map para que el frontend reciba un objeto JSON válido
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> tokenMap = mapper.readValue(tokenJson, new TypeReference<>() {});
+            return ResponseEntity.ok(tokenMap);
+        } catch (JsonProcessingException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Error al procesar el token");
+        }
     }
     @GetMapping("/search")
     @PreAuthorize("hasRole('admin_client_role')")
