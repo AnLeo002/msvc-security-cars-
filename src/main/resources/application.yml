@@ -37,3 +37,8 @@ keycloak:
   client-secret: HfMVc8W9Q6WTqKzPdbSFIXlSIArlhkqo
   client-id: cars-client
   enabled: true
+
+gateway:
+  auth:
+    header: X-GATEWAY-SECRET
+    value: key-microservices
